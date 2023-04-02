@@ -65,30 +65,36 @@ const bottomLine = `bottomLine`
 const AnswerBlock = ()=>{
     const state: AnyObj = useModelState<State>() || {}
     const {
-        rollAnswerInfo,
+        rollAskAnswerInfo,
     } = state
 
-    const [answerCount, setAnserCount] = useState(rollAnswerInfo?.length || 0)
+    const [answerCount, setAnserCount] = useState(rollAskAnswerInfo?.length || 0)
 
     useEffect(()=>{
-        if(rollAnswerInfo?.length > answerCount){
+        if(rollAskAnswerInfo?.length > answerCount){
             const element = document.querySelector(`#${bottomLine}`);
             element.scrollIntoView({ behavior: 'smooth' });
-            setAnserCount(rollAnswerInfo.length)
+            setAnserCount(rollAskAnswerInfo.length)
         }
-    }, [rollAnswerInfo])
+    }, [rollAskAnswerInfo])
 
     return (
         <div className='answer_block'>
-            {_.map(rollAnswerInfo, (answertem)=>{
+            {_.map(rollAskAnswerInfo, (answertem)=>{
                 const {
                     timestamp,
+                    answer,
                 } = answertem || {}
-                return (
-                    <div key={`talkinfo_${timestamp}`}>
-                        <TypingCard talkItem={answertem} />
-                    </div>
-                )
+                if(answer){
+                    return (
+                        <div key={`talkinfo_${timestamp}`}>
+                            <TypingCard talkItem={answertem} />
+                        </div>
+                    )
+                }else{
+                    return null
+                }
+                
             })}
             <div id={bottomLine} />
         </div>
@@ -105,11 +111,10 @@ const TypingCard = ({talkItem, noTyping}: {talkItem: any, noTyping?: boolean})=>
 
     const textLength = answer?.length || 0
     const [count, setCount] = useState(noTyping ? textLength : 0)
-    const [typingText, setTypeText] = useState(answer?.[0])
+    const [typingText, setTypeText] = useState(answer?.[0] || '')
     useEffect(()=>{
-
         if(count <= textLength){
-            setTypeText(answer.substr(0, count))
+            setTypeText(answer?.substr(0, count) || '')
             setTimeout(()=>{
                 setCount(count + 1)
             }, 100)

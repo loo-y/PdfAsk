@@ -21,7 +21,7 @@ export const ADD_QUERY_ASK : Action<State, {askInfo: AskAnswerInfo}> = (state, {
     const {
         timestamp
     } = askInfo || {}    
-    const newList = ([...rollAskAnswerInfo] || []).concat([{
+    const newList = (rollAskAnswerInfo || []).concat([{
         ...askInfo,
         status: ASK_ANSWER_STATUS.ASK,
         timeShort: dayjs(Number(timestamp)).format('YYYY-MM-DDTHH:mm:ss'),
