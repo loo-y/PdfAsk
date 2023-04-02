@@ -1,5 +1,5 @@
 {
-    "name": "PdfAsk",
+    "name": "pdfask",
     "version": "1.0.0",
     "description": "PdfAsk",
     "main": "index.js",
@@ -8,13 +8,37 @@
         "vd": "/"
     },
     "scripts": {
-        "start": "react-imvc start",
-        "build": "react-imvc build",
-        "test": "react-imvc test"
+        "start": "react-imvc start --config ./imvc.config.js",
+        "start:debug": "react-imvc start?inspect-brk --config ./imvc.config.js",
+        "build": "react-imvc build --config ./imvc.config.js",
+        "test": "react-imvc test",
+        "rebuild-restart": "pm2 kill && npm run build && pm2 start ./publish/start.js -i 1"
     },
     "dependencies": {
+        "@pinecone-database/pinecone": "^0.0.10",
+        "body-parser": "^1.20.2",
+        "body-parser-xml": "^2.0.3",
+        "bootstrap": "^5.2.3",
+        "clipboard-copy": "^4.0.1",
+        "cross-fetch": "3.1.5",
+        "dayjs": "1.11.7",
+        "lodash": "4.17.21",
+        "react-pdf": "^6.2.2",
+        "react-bootstrap": "^2.7.2",
+        "dotenv": "^16.0.3",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-imvc": "^3.2.7"
+    },
+    "devDependencies": {
+        "@types/lodash": "4.14.191",
+        "css-loader": "^6.7.3",
+        "esm": "^3.2.25",
+        "pdf-loader": "^1.0.2",
+        "style-loader": "^3.3.1",
+        "tslint": "^5.20.1",
+        "tslint-config-prettier": "^1.18.0",
+        "tslint-config-standard": "^9.0.0",
+        "typescript": "^4.9.5"
     }
 }

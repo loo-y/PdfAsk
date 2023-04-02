@@ -1,0 +1,1 @@
+export type LONG_CONTEXT_TYPE = {page: number, textlines: Array<string>}
