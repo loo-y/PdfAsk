@@ -4,6 +4,7 @@ import { Document, Page, pdfjs } from 'react-pdf';//'react-pdf';
 import { useCtrl } from 'react-imvc/hook';
 import Ctrl from '../Controller'
 import { Carousel, Form, Button } from 'react-bootstrap';
+import { PDF_UPLOAD_STATUS } from '../types';
 // 设置 PDF.js 的 workerSrc
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.js';
 
@@ -108,29 +109,58 @@ const ControlledCarousel=({file, loadCallback}: {file:any, loadCallback?: Functi
 
 
   
-const LoadingButton = () => {
-    const [isLoading, setLoading] = useState(false);
+const LoadingButton = ({initStatus}: {initStatus?: PDF_UPLOAD_STATUS}) => {
+    const [status, setStatus] = useState(PDF_UPLOAD_STATUS.UNLOAD);
+    const [disabled, setDisabled] = useState(false)
+    const [buttonText, setButtonText] = useState('Click to Upload')
+
     const { handleUPloadPdf } = useCtrl<Ctrl>()
+    useEffect(()=>{
+        if(initStatus) setStatus(initStatus)
+    }, [initStatus])
     useEffect(() => {
+        console.log(`status`, status)
+        switch(status){
+            case PDF_UPLOAD_STATUS.FAILED:
+                setDisabled(false)
+                setButtonText('Failed, Try Again')
+                break;
+            case PDF_UPLOAD_STATUS.SUCCESS:
+                setDisabled(true)
+                setButtonText('Upload Success')
+                break
+            case PDF_UPLOAD_STATUS.LOADING:
+                setDisabled(true)
+                setButtonText('UPloading')
+                break
+            case PDF_UPLOAD_STATUS.UNLOAD:
+                setDisabled(false);
+                setButtonText('Click to Upload')
+            default:
+                break;
+        }
+    }, [status]);
+
+    const handleClick = () => {
+        setDisabled(true)
         const asnycEffect = async()=>{
-            if(isLoading){
-                await handleUPloadPdf()
-                setLoading(false)
+            if(status == PDF_UPLOAD_STATUS.UNLOAD || status == PDF_UPLOAD_STATUS.FAILED){
+                setStatus(PDF_UPLOAD_STATUS.LOADING)
+                const isSuccess = await handleUPloadPdf()
+                setStatus(isSuccess ? PDF_UPLOAD_STATUS.SUCCESS : PDF_UPLOAD_STATUS.FAILED)
             }
         }
-        asnycEffect()
-    }, [isLoading]);
-
-    const handleClick = () => setLoading(true);
+        asnycEffect();
+    }
 
     return (
         <div className='loading_button'>
         <Button
         variant="primary"
-        disabled={isLoading}
-        onClick={!isLoading ? handleClick : null}
+        disabled={disabled}
+        onClick={handleClick}
         >
-        {isLoading ? 'Loading…' : 'Click to Upload'}
+        {buttonText}
         </Button>
         </div>
     );

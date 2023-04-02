@@ -61,7 +61,8 @@ export default class PdfAskController extends Controller<Model.State, Action> {
     handleUPloadPdf = async()=>{
         const { pagesContentList } = this.store.getState() || {}
         await sleep(3)
-        if(_.isEmpty(pagesContentList)) return;
+        if(_.isEmpty(pagesContentList)) return false;
+        return true;
     }
 
     handleGetAnswer = async (text)=>{
