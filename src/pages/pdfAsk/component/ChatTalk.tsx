@@ -1,13 +1,18 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useCtrl, useModelState } from 'react-imvc/hook'
 import Ctrl from '../Controller'
-import { Form, FloatingLabel, Button} from 'react-bootstrap'
+import { State } from '../Model'
+import { Form, FloatingLabel, Button, Card} from 'react-bootstrap'
 import _ from 'lodash'
+import { AnyObj } from '../types';
 
 const ChatTalk = () => {
+    const state: AnyObj = useModelState<State>() || {}
+    const {} = state || {}
     return (
         <div id="chat_talk">
             <AskIput />
+            <AnswerBlock />
         </div>
     )
 }
@@ -17,7 +22,7 @@ export default ChatTalk
 
   
 const AskIput = ()=>{
-    // const { handlerSendWord  } = useCtrl<Ctrl>()
+    const { handleGetAnswer  } = useCtrl<Ctrl>()
     const [buttonDisabled, setButtonDisabled] = useState(true)
     const inputId = `floatingInput`
     const formSubmit = (e)=>{
@@ -25,7 +30,7 @@ const AskIput = ()=>{
         e.preventDefault()
         const input = e?.target?.elements?.[inputId];
         const inputValue = input?.value || ``
-        // handlerSendWord(inputValue)
+        handleGetAnswer(inputValue)
         // clear input value
         input.value = ``
         setButtonDisabled(true)
@@ -53,5 +58,75 @@ const AskIput = ()=>{
                 </FloatingLabel>
             </Form>
         </div>
+    )
+}
+
+const bottomLine = `bottomLine`
+const AnswerBlock = ()=>{
+    const state: AnyObj = useModelState<State>() || {}
+    const {
+        rollAnswerInfo,
+    } = state
+
+    const [answerCount, setAnserCount] = useState(rollAnswerInfo?.length || 0)
+
+    useEffect(()=>{
+        if(rollAnswerInfo?.length > answerCount){
+            const element = document.querySelector(`#${bottomLine}`);
+            element.scrollIntoView({ behavior: 'smooth' });
+            setAnserCount(rollAnswerInfo.length)
+        }
+    }, [rollAnswerInfo])
+
+    return (
+        <div className='answer_block'>
+            {_.map(rollAnswerInfo, (answertem)=>{
+                const {
+                    timestamp,
+                } = answertem || {}
+                return (
+                    <div key={`talkinfo_${timestamp}`}>
+                        <TypingCard talkItem={answertem} />
+                    </div>
+                )
+            })}
+            <div id={bottomLine} />
+        </div>
+    )
+}
+
+const TypingCard = ({talkItem, noTyping}: {talkItem: any, noTyping?: boolean})=>{
+    const {
+        answer,
+        question,
+        timeShort,
+        timestamp,
+    } = talkItem || {}
+
+    const textLength = answer?.length || 0
+    const [count, setCount] = useState(noTyping ? textLength : 0)
+    const [typingText, setTypeText] = useState(answer?.[0])
+    useEffect(()=>{
+
+        if(count <= textLength){
+            setTypeText(answer.substr(0, count))
+            setTimeout(()=>{
+                setCount(count + 1)
+            }, 100)
+        }
+    }, [count])
+    return (
+        <Card style={{ width: '100%', marginBottom: "12px" }} bg={`dark`} text="light">
+            <Card.Body>
+                <Card.Subtitle>{``}</Card.Subtitle>
+                <Card.Text>
+                    {typingText}
+                </Card.Text>
+
+            </Card.Body>
+            <Card.Footer>
+                <small className="text-secondary">{timeShort}</small>
+            </Card.Footer>
+        </Card>
     )
 }

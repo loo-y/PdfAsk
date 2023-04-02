@@ -47,6 +47,17 @@ export default class PdfAskController extends Controller<Model.State, Action> {
     /************************* fetch **************************/
 
     fetchQuery = async (text)=>{
+        const url = `/api/query`
+        try{
+            const params = {
+                text
+            }
+            const resp = await this.post(url, params)
+            console.log(`相关回答: \n`,resp?.result?.content || resp?.error)
+            return resp;
+        }catch(e){
+            return null
+        }
     }
     /************************* helper **************************/
 
@@ -60,12 +71,74 @@ export default class PdfAskController extends Controller<Model.State, Action> {
     }
     handleUPloadPdf = async()=>{
         const { pagesContentList } = this.store.getState() || {}
-        await sleep(3)
-        if(_.isEmpty(pagesContentList)) return false;
-        return true;
+        let longContextList: Array<LONG_CONTEXT_TYPE> = [];
+        _.map(pagesContentList, pageContentList=>{
+            const {
+                page,
+                contentList
+            } = pageContentList || {}
+            let longContext: LONG_CONTEXT_TYPE  = {
+                page,
+                textlines: []
+            }
+            let thisLine = '', lastTransformString = '';
+            _.map(contentList, (content, contentIndex: number)=>{
+                const {
+                    transform, str
+                } = content || {}
+                const sameLineTrans = (transform.slice(0, 4).concat([transform[transform.length-1]])).join(',')
+                if(!lastTransformString || (sameLineTrans == lastTransformString)){
+                    thisLine += str;
+                    if(contentIndex == contentList.length - 1){
+                        longContext.textlines.push(thisLine)
+                    }
+                } else {
+                    longContext.textlines.push(thisLine)
+                    thisLine = str;
+                }
+                lastTransformString = sameLineTrans
+            })
+
+            longContextList.push({
+                ...longContext
+            })
+        })
+
+        console.log(longContextList)
+
+        const url = `/api/sendpdf`
+        try{
+            const params = {
+                longContextList
+            }
+            const resp = await this.post(url, params)
+            return true;
+        }catch(e){
+           console.log(`handleUploadPdf error`, e) 
+        }
+        
+        return false;
     }
 
     handleGetAnswer = async (text)=>{
-        const result = await this.fetchQuery(text)
+        const trimText = _.trim(text)
+        if(!(trimText.length > 0)) return false;
+        const now = new Date()
+        const { ADD_QUERY_ASK, ADD_QUERY_ANSWER } = this.store.actions || {}
+        ADD_QUERY_ASK({
+            askInfo: {
+                timestamp: now.getTime(),
+                question: trimText,
+            }
+        })
+        const resultQuery = await this.fetchQuery(trimText)
+        if(resultQuery?.result?.content){
+            ADD_QUERY_ANSWER({
+                answerInfo: {
+                    timestamp: now.getTime(),
+                    answer: resultQuery.result.content,
+                }
+            })
+        }
     }
 }
