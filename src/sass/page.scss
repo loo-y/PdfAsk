@@ -1,0 +1,36 @@
+body{
+    margin: 20px;
+}
+
+#pdfreader{
+    max-width: 800px;
+    .top_line{
+        position: relative;
+        .uploadinput{
+            &.loaded{
+                margin-right: 200px;
+            }
+        }
+
+        .loading_button{
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+    }
+
+    .inside_carousel{
+        background-color: #555;
+        padding-top: 20px;
+        .pdf_page_number{
+            text-align: center;
+            color: #eee;
+        }
+        canvas{
+            left: 50%;
+            transform: translate(-50%, 0);
+            position: relative;
+            min-width: "595px";
+        }
+    }
+}

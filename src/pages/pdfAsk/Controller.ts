@@ -5,6 +5,7 @@ import * as Model from './Model'
 import Controller from 'react-imvc/controller'
 import { Location, Context, SSR } from 'react-imvc'
 import { LONG_CONTEXT_TYPE } from './types'
+import { sleep } from '../../shared/util'
 
 export type Action = Omit<typeof Model, 'initialState'>
 export default class PdfAskController extends Controller<Model.State, Action> {
@@ -50,7 +51,17 @@ export default class PdfAskController extends Controller<Model.State, Action> {
     /************************* helper **************************/
 
     /************************* handler **************************/
-    handleUPloadPdf = async(pagesContentList)=>{
+
+    handleSetPageContentList = (pagesContentList)=>{
+        const { UPDATE_STATE } = this.store.actions || {}
+        UPDATE_STATE({
+            pagesContentList
+        })
+    }
+    handleUPloadPdf = async()=>{
+        const { pagesContentList } = this.store.getState() || {}
+        await sleep(3)
+        if(_.isEmpty(pagesContentList)) return;
     }
 
     handleGetAnswer = async (text)=>{
