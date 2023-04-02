@@ -1,0 +1,20 @@
+{
+    "name": "PdfAsk",
+    "version": "1.0.0",
+    "description": "PdfAsk",
+    "main": "index.js",
+    "config": {
+        "port": 3008,
+        "vd": "/"
+    },
+    "scripts": {
+        "start": "react-imvc start",
+        "build": "react-imvc build",
+        "test": "react-imvc test"
+    },
+    "dependencies": {
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-imvc": "^3.2.7"
+    }
+}
