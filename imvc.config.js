@@ -1,6 +1,5 @@
 const path = require('path')
 const pkg = require('./package')
-// const defaultBabel = require('react-imvc/dist/config/babel');
 
 const isDeploy = process.env.IS_DEPLOY === '1'
 const isProd = process.env.NODE_ENV === 'production'
@@ -59,7 +58,16 @@ module.exports = {
                 webpackConfig.module.rules.push({ test: /\.css$/, use: cssMatchUse })
             }
         }
-        
+        webpackConfig.module.rules.push(
+            {
+                test: /pdf\.js$/,
+                loader: 'babel-loader',
+                options: {
+                  presets: ['@babel/preset-env'],
+                  plugins: ['@babel/plugin-proposal-private-property-in-object']
+                }
+            }
+        )
         return webpackConfig
     },
     // 打包文件名称格式

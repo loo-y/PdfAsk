@@ -7,7 +7,7 @@ import { Location, Context, SSR } from 'react-imvc'
 import { LONG_CONTEXT_TYPE } from './types'
 
 export type Action = Omit<typeof Model, 'initialState'>
-export default class PdfReaderController extends Controller<Model.State, Action> {
+export default class PdfAskController extends Controller<Model.State, Action> {
     SSR?: SSR = this.location.query.ssr !== 'false'
     View = View
     Model = Model
