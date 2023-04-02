@@ -1,6 +1,10 @@
 body {
   margin: 20px; }
 
+.pdfask_body {
+  position: relative;
+  min-width: 1200px; }
+
 #pdfreader {
   max-width: 800px; }
   #pdfreader .top_line {
@@ -23,3 +27,17 @@ body {
               transform: translate(-50%, 0);
       position: relative;
       min-width: "595px"; }
+
+#chat_talk {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  width: 380px; }
+  #chat_talk textarea {
+    resize: none;
+    height: 120px; }
+  #chat_talk .ask_button {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 80px; }
