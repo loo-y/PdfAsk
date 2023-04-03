@@ -132,13 +132,13 @@ export default class PdfAskController extends Controller<Model.State, Action> {
             }
         })
         const resultQuery = await this.fetchQuery(trimText)
-        if(resultQuery?.result?.content){
-            ADD_QUERY_ANSWER({
-                answerInfo: {
-                    timestamp: now.getTime(),
-                    answer: resultQuery.result.content,
-                }
-            })
-        }
+
+        ADD_QUERY_ANSWER({
+            answerInfo: {
+                timestamp: now.getTime(),
+                answer: resultQuery?.result?.content || `没有找到相关的内容`,
+            }
+        })
+        
     }
 }

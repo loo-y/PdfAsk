@@ -3,7 +3,8 @@ body{
 }
 .pdfask_body{
     position: relative;
-    min-width: 1200px;
+    min-width: 1220px;
+    max-width: 1280px;
 }
 #pdfreader{
     max-width: 800px;
@@ -38,6 +39,10 @@ body{
     }
 }
 
+#bottomLine{
+    margin-bottom: 1px;
+    height: 1px;
+}
 #chat_talk{
     position: absolute;
     top: 30px;
@@ -56,7 +61,7 @@ body{
         width: 80px;
     }
 
-    .answer_block{
-        height: 650px;
-    }
+    // .answer_block{
+    //     height: 650px;
+    // }
 }

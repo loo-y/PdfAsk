@@ -42,7 +42,7 @@ export const ADD_QUERY_ANSWER : Action<State, {answerInfo: Partial<AskAnswerInfo
         answer,
     } = answerInfo || {}
 
-    const newList = _.map(rollAskAnswerInfo || [], askAnswerInfo=>{
+    const newList = _.orderBy(_.map(rollAskAnswerInfo || [], askAnswerInfo=>{
         if(askAnswerInfo?.timestamp == timestamp){
             
             return {
@@ -52,7 +52,7 @@ export const ADD_QUERY_ANSWER : Action<State, {answerInfo: Partial<AskAnswerInfo
             }
         }
         return askAnswerInfo;
-    })
+    }), ['timestamp'], ['asc'])
 
     return {
         ...state,

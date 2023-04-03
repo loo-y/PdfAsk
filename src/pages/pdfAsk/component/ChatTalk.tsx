@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef} from 'react';
 import { useCtrl, useModelState } from 'react-imvc/hook'
 import Ctrl from '../Controller'
 import { State } from '../Model'
@@ -11,10 +11,18 @@ import { AnyObj } from '../types';
 const ChatTalk = () => {
     const state: AnyObj = useModelState<State>() || {}
     const {} = state || {}
+
+    const stickyProps = {
+        top: 20,
+        enabled: true,
+        className: `sticky_chat_talk`,
+    }
     return (
         <div id="chat_talk">
+            <Sticky {...stickyProps}>
             <AskIput />
             <AnswerBlock />
+            </Sticky>
         </div>
     )
 }
@@ -63,13 +71,15 @@ const AskIput = ()=>{
     )
 }
 
-const bottomLine = `bottomLine`
+const bottomLine = `bottomLine`;
+let lazyToBottom: any;
 const AnswerBlock = ()=>{
     const state: AnyObj = useModelState<State>() || {}
     const {
         rollAskAnswerInfo,
     } = state
-
+    const scrollRef = useRef(null)
+    const [scrollbarsMaxHeight, setScrollbarsMaxHeight] = useState(0)
     const [answerCount, setAnserCount] = useState(rollAskAnswerInfo?.length || 0)
 
     useEffect(()=>{
@@ -80,25 +90,72 @@ const AnswerBlock = ()=>{
         }
     }, [rollAskAnswerInfo])
 
+    useEffect(()=>{
+        let _scrollbarsMaxHeight = _.max([window?.innerHeight * 0.75 - 48, 0]) || 536
+        setScrollbarsMaxHeight(_.min([_scrollbarsMaxHeight, 536]))
+        const theBottom: HTMLElement = document.querySelector(`#${bottomLine}`)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting && entry.intersectionRatio === 1) {
+                console.log('Element is fully visible.');
+              } else {
+                console.log('Element is not fully visible.');
+                scrollToBottom(theBottom)
+              }
+            });
+          });
+          observer.observe(theBottom);
+    }, [])
+    
+    const renderScrollView = ({ style, ...props })=> {
+        console.log(`renderScrollView`, style, props)
+        return <div {...props} style={{ ...style }} />
+    }
+
+    const scrollToBottom = (bottomLineEle: HTMLElement) => {
+        // const theBottom: HTMLElement = document.querySelector(`#${bottomLine}`)
+        lazyToBottom = setTimeout(()=>{
+            if (bottomLineEle) {
+                const topNumber = bottomLineEle.offsetTop                
+                scrollRef.current.scrollTop(topNumber + 2)
+            }
+        }, 100);  
+    }
+
+    const handleScrollFrame = ()=>{
+        clearTimeout(lazyToBottom)
+    }
+    // if(!scrollbarsMaxHeight) return <div id={bottomLine} />
+
     return (
         <div className='answer_block'>
-            {_.map(rollAskAnswerInfo, (answertem)=>{
-                const {
-                    timestamp,
-                    answer,
-                } = answertem || {}
-                if(answer){
-                    return (
-                        <div key={`talkinfo_${timestamp}`}>
-                            <TypingCard talkItem={answertem} />
-                        </div>
-                    )
-                }else{
-                    return null
-                }
-                
-            })}
+            <Scrollbars 
+            autoHeight={true} 
+            autoHeightMax={scrollbarsMaxHeight}
+            renderView={renderScrollView}
+            onScrollFrame={handleScrollFrame}
+            ref={scrollRef}
+            >
+            <div>
+                {_.map(rollAskAnswerInfo, (answertem)=>{
+                    const {
+                        timestamp,
+                        answer,
+                    } = answertem || {}
+                    if(answer){
+                        return (
+                            <div key={`talkinfo_${timestamp}`}>
+                                <TypingCard talkItem={answertem} />
+                            </div>
+                        )
+                    }else{
+                        return null
+                    }
+                    
+                })}
+            </div>
             <div id={bottomLine} />
+            </Scrollbars>
         </div>
     )
 }
