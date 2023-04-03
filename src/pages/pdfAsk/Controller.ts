@@ -48,9 +48,11 @@ export default class PdfAskController extends Controller<Model.State, Action> {
 
     fetchQuery = async (text)=>{
         const url = `/api/query`
+        const { namespace } = this.store.getState()
         try{
             const params = {
-                text
+                text,
+                namespace,
             }
             const resp = await this.post(url, params)
             console.log(`相关回答: \n`,resp?.result?.content || resp?.error)
@@ -69,7 +71,7 @@ export default class PdfAskController extends Controller<Model.State, Action> {
             pagesContentList
         })
     }
-    handleUPloadPdf = async()=>{
+    handleUPloadPdf = async(filename)=>{
         const { pagesContentList } = this.store.getState() || {}
         let longContextList: Array<LONG_CONTEXT_TYPE> = [];
         _.map(pagesContentList, pageContentList=>{
@@ -109,9 +111,15 @@ export default class PdfAskController extends Controller<Model.State, Action> {
         const url = `/api/sendpdf`
         try{
             const params = {
-                longContextList
+                longContextList,
+                pdfName: filename,
             }
             const resp = await this.post(url, params)
+            const { namespace } = resp || {}
+            const { UPDATE_STATE } = this.store.actions || {}
+            UPDATE_STATE({
+                namespace
+            })
             return true;
         }catch(e){
            console.log(`handleUploadPdf error`, e) 

@@ -36,7 +36,7 @@ const PdfReader = () => {
                     <Form.Label>Please choose a PDF file</Form.Label>
                     <Form.Control type="file" />
                 </Form.Group>
-                {fileLoadStatus == 1? <LoadingButton /> : null}
+                {fileLoadStatus == 1? <LoadingButton file={file} /> : null}
             </div>
             {file ? (
                 <ControlledCarousel file={file} loadCallback={onLoadedSuccess} />
@@ -109,7 +109,7 @@ const ControlledCarousel=({file, loadCallback}: {file:any, loadCallback?: Functi
 
 
   
-const LoadingButton = ({initStatus}: {initStatus?: PDF_UPLOAD_STATUS}) => {
+const LoadingButton = ({initStatus, file}: {initStatus?: PDF_UPLOAD_STATUS, file: any}) => {
     const [status, setStatus] = useState(PDF_UPLOAD_STATUS.UNLOAD);
     const [disabled, setDisabled] = useState(false)
     const [buttonText, setButtonText] = useState('Click to Upload')
@@ -146,7 +146,8 @@ const LoadingButton = ({initStatus}: {initStatus?: PDF_UPLOAD_STATUS}) => {
         const asnycEffect = async()=>{
             if(status == PDF_UPLOAD_STATUS.UNLOAD || status == PDF_UPLOAD_STATUS.FAILED){
                 setStatus(PDF_UPLOAD_STATUS.LOADING)
-                const isSuccess = await handleUPloadPdf()
+                const { name } = file || {}
+                const isSuccess = await handleUPloadPdf(name)
                 setStatus(isSuccess ? PDF_UPLOAD_STATUS.SUCCESS : PDF_UPLOAD_STATUS.FAILED)
             }
         }

@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { getEmbeddings, chatAskQuestion } from './openaiConnect'
 import { getIndex, createIndex, insert, findSimilar, deleteAllVectors} from './pineconeConnect/direct'
 import { splitTextInDoc, } from './contexts'
+import { sha256_16bit } from './util'
 
 
 const router = Router()
@@ -13,14 +14,18 @@ export default function (app) {
 const openaiPineconeIndex = 'openai'
 const testNamespace = `openaiNamespace`
 router.use('/deleteAllVectors', async (req, res, next) => {
-    const i = await deleteAllVectors({index: openaiPineconeIndex, namespace: testNamespace})
+    const {
+        namespace,
+    } = req.body
+    const i = await deleteAllVectors({index: openaiPineconeIndex, namespace: namespace || testNamespace})
     res.status(200).send(i)
 })
 
 router.post("/sendpdf",  async (req, res, next) => {
     const {
-        longContextList
+        longContextList, pdfName
     } = req?.body || {}
+    const sha256_namespace = sha256_16bit(pdfName)
 
     const docs = await splitTextInDoc({
         longContextList,
@@ -34,7 +39,7 @@ router.post("/sendpdf",  async (req, res, next) => {
 
     await Promise.all(_.map(chunkDocsList, (chunkDocs, chunkIndex)=>{
         return new Promise(async(resolve, reject)=>{
-            const textList = _.map(chunkDocs, (doc)=>{
+            const textList = _.map(chunkDocs, (doc: any)=>{
                 const {
                     pageContent, metadata
                 } = doc || {}
@@ -54,19 +59,27 @@ router.post("/sendpdf",  async (req, res, next) => {
             await insert({
                 index: openaiPineconeIndex,
                 vectors: completedVectors,
-                namespace: testNamespace
+                namespace: sha256_namespace,
             })
             resolve(true);
         })
     }))
 
-    return res.status(200).json(docs)
+    return res.status(200).json({docs, namespace: sha256_namespace})
+})
+
+
+router.post('/getpdf', async (req, res, next) => {
+    const {
+        code
+    } = req?.body || {}
+    return res.status(200).json({})
 })
 
 
 router.post('/query', async(req, res, next)=>{
     const {
-        text,
+        text, namespace,
     } = req?.body || {}
     if(!text) return res.status(200).json({error: `no text`})
 
@@ -80,7 +93,7 @@ router.post('/query', async(req, res, next)=>{
 
     const result = await findSimilar({
         index: openaiPineconeIndex,
-        namespace: testNamespace,
+        namespace,
         vector: queryVector
     })
 

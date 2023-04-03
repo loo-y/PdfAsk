@@ -118,7 +118,6 @@ const AnswerBlock = ()=>{
     }, [])
     
     const renderScrollView = ({ style, ...props })=> {
-        console.log(`renderScrollView`, style, props)
         return <div {...props} style={{ ...style }} />
     }
 
