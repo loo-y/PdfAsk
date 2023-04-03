@@ -140,5 +140,6 @@ export default class PdfAskController extends Controller<Model.State, Action> {
             }
         })
         
+        return true;
     }
 }

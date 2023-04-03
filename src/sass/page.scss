@@ -4,7 +4,8 @@ body{
 .pdfask_body{
     position: relative;
     min-width: 1220px;
-    max-width: 1280px;
+    max-width: 1220px;
+    margin: 0 auto;
 }
 #pdfreader{
     max-width: 800px;
@@ -52,6 +53,9 @@ body{
     textarea{
         resize: none;
         height: 120px;
+        &.loading{
+            color: #999
+        }
     }
 
     .ask_button{
@@ -61,6 +65,12 @@ body{
         width: 80px;
     }
 
+    .loading_spinner{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
     // .answer_block{
     //     height: 650px;
     // }

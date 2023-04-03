@@ -4,7 +4,8 @@ body {
 .pdfask_body {
   position: relative;
   min-width: 1220px;
-  max-width: 1280px; }
+  max-width: 1220px;
+  margin: 0 auto; }
 
 #pdfreader {
   max-width: 800px; }
@@ -41,8 +42,16 @@ body {
   #chat_talk textarea {
     resize: none;
     height: 120px; }
+    #chat_talk textarea.loading {
+      color: #999; }
   #chat_talk .ask_button {
     position: absolute;
     bottom: 5px;
     right: 5px;
     width: 80px; }
+  #chat_talk .loading_spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); }

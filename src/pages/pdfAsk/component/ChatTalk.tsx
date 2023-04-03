@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef} from 'react';
 import { useCtrl, useModelState } from 'react-imvc/hook'
 import Ctrl from '../Controller'
 import { State } from '../Model'
-import { Form, FloatingLabel, Button, Card} from 'react-bootstrap'
+import { Form, FloatingLabel, Button, Card, Spinner} from 'react-bootstrap'
 import Sticky from 'react-stickynode'
 import { Scrollbars } from 'react-custom-scrollbars'
 import _ from 'lodash'
@@ -34,16 +34,19 @@ export default ChatTalk
 const AskIput = ()=>{
     const { handleGetAnswer  } = useCtrl<Ctrl>()
     const [buttonDisabled, setButtonDisabled] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
     const inputId = `floatingInput`
-    const formSubmit = (e)=>{
+    const formSubmit = async (e)=>{
+        setIsLoading(true)
+        setButtonDisabled(true)
         e.stopPropagation();
         e.preventDefault()
         const input = e?.target?.elements?.[inputId];
         const inputValue = input?.value || ``
-        handleGetAnswer(inputValue)
+        await handleGetAnswer(inputValue)
         // clear input value
         input.value = ``
-        setButtonDisabled(true)
+        setIsLoading(false)
         return false;
     }
 
@@ -63,8 +66,15 @@ const AskIput = ()=>{
                     label="请提问本PDF相关内容"
                     className="mb-3"
                 >
-                    <Form.Control as="textarea" placeholder="请提问本PDF相关内容" onChange={onTextChange} rows={3} />
-                    <Button variant="primary" disabled={buttonDisabled} type="submit" className='ask_button'>提问</Button>
+                    {isLoading ? (
+                        <div className='loading_spinner'>
+                            <Spinner animation="border" role="status" >
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
+                        </div>
+                    ) : null}
+                    <Form.Control as="textarea" className={isLoading ? 'loading': ''} readOnly={isLoading} placeholder="请提问本PDF相关内容" onChange={onTextChange} rows={3} />
+                    <Button variant="primary" disabled={buttonDisabled} type="submit" className='ask_button'>{isLoading ? `Loading` : `提问`}</Button>
                 </FloatingLabel>
             </Form>
         </div>
