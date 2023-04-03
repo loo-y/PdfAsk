@@ -3,6 +3,8 @@ import { useCtrl, useModelState } from 'react-imvc/hook'
 import Ctrl from '../Controller'
 import { State } from '../Model'
 import { Form, FloatingLabel, Button, Card} from 'react-bootstrap'
+import Sticky from 'react-stickynode'
+import { Scrollbars } from 'react-custom-scrollbars'
 import _ from 'lodash'
 import { AnyObj } from '../types';
 

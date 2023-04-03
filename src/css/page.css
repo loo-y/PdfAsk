@@ -31,7 +31,7 @@ body {
 #chat_talk {
   position: absolute;
   top: 30px;
-  right: 0;
+  right: 20px;
   width: 380px; }
   #chat_talk textarea {
     resize: none;

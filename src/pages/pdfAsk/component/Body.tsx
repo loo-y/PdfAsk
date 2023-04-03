@@ -4,7 +4,7 @@ import ChatTalk from './ChatTalk'
 
 const Body = ()=>{
     return (
-        <div className='pdfask_body'>
+        <div className='pdfask_body' id="pdfask_body">
             <PdfReader />
             <ChatTalk />
         </div>
