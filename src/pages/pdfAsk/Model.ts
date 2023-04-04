@@ -2,16 +2,18 @@ import _ from 'lodash'
 import { Action, BaseState } from 'react-imvc'
 import { AnyObj, AskAnswerInfo, ASK_ANSWER_STATUS } from './types'
 import dayjs from 'dayjs'
+import { PDF_UPLOAD_STATUS } from './types'
 type InitialState = { 
     pdfile?: any, 
     pagesContentList: AnyObj[],
-    rollAskAnswerInfo: AskAnswerInfo[]
+    rollAskAnswerInfo: AskAnswerInfo[],
+    uploadStatus: PDF_UPLOAD_STATUS
  }
 
 export type State = BaseState & InitialState
 
 export const initialState = {
-
+    uploadStatus: PDF_UPLOAD_STATUS.UNLOAD,
 }
 
 export const ADD_QUERY_ASK : Action<State, {askInfo: AskAnswerInfo}> = (state, {askInfo})=>{

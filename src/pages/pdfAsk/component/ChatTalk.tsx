@@ -7,15 +7,20 @@ import Sticky from 'react-stickynode'
 import { Scrollbars } from 'react-custom-scrollbars'
 import _ from 'lodash'
 import { AnyObj } from '../types';
+import { PDF_UPLOAD_STATUS } from '../types';
 
 const ChatTalk = () => {
     const state: AnyObj = useModelState<State>() || {}
-    const {} = state || {}
+    const { uploadStatus } = state || {}
 
     const stickyProps = {
         top: 20,
         enabled: true,
         className: `sticky_chat_talk`,
+    }
+
+    if(uploadStatus !== PDF_UPLOAD_STATUS.SUCCESS){
+        return <div id="chat_talk"></div>
     }
     return (
         <div id="chat_talk">

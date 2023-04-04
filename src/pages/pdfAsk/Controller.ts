@@ -4,7 +4,7 @@ import View from './View'
 import * as Model from './Model'
 import Controller from 'react-imvc/controller'
 import { Location, Context, SSR } from 'react-imvc'
-import { LONG_CONTEXT_TYPE } from './types'
+import { LONG_CONTEXT_TYPE, PDF_UPLOAD_STATUS } from './types'
 import { sleep } from '../../shared/util'
 
 export type Action = Omit<typeof Model, 'initialState'>
@@ -72,6 +72,8 @@ export default class PdfAskController extends Controller<Model.State, Action> {
         })
     }
     handleUPloadPdf = async(filename)=>{
+        const { UPDATE_STATE } = this.store.actions || {}
+        UPDATE_STATE({uploadStatus: PDF_UPLOAD_STATUS.LOADING })
         const { pagesContentList } = this.store.getState() || {}
         let longContextList: Array<LONG_CONTEXT_TYPE> = [];
         _.map(pagesContentList, pageContentList=>{
@@ -118,13 +120,14 @@ export default class PdfAskController extends Controller<Model.State, Action> {
             const { namespace } = resp || {}
             const { UPDATE_STATE } = this.store.actions || {}
             UPDATE_STATE({
-                namespace
+                namespace,
+                uploadStatus: PDF_UPLOAD_STATUS.SUCCESS,
             })
             return true;
         }catch(e){
            console.log(`handleUploadPdf error`, e) 
         }
-        
+        UPDATE_STATE({uploadStatus: PDF_UPLOAD_STATUS.FAILED})
         return false;
     }
 
