@@ -13,3 +13,4 @@
 
 
 
+<img src="/assets/images/wx_qcode.jpg" alt="wechat group" width="200px" height="255px">
