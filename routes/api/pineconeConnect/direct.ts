@@ -12,6 +12,7 @@ import {
     commonHeaders,
     jsonContentType,
 } from '../constants'
+import { sleep } from '../../util'
 
 dotenv.config()
 export const getIndex = async ({ index }: { index: string }) => {
@@ -71,12 +72,19 @@ export const insert = async ({
     index,
     vectors,
     namespace,
+    retry,
 }: {
     index?: string
     vectors: Vector[]
     namespace?: string
+    retry?: number
 }) => {
-    if (!index) return false
+    if (!index) return 0
+    retry = isNaN(retry) ? 3 : retry
+    if (!(retry > 0)) {
+        console.log(`insert failed, retry:`, retry)
+        return 0
+    }
     const url = VectorUpsertUrl.replace(`{{index}}`, index)
 
     try {
@@ -99,8 +107,15 @@ export const insert = async ({
         }
         const error = await result.json()
         console.log(`insert result.status`, result.status, error)
+        retry--
+        console.log(`retry,`, retry)
+        await sleep(0.1)
+        return insert({ index, vectors, namespace, retry })
     } catch (e) {
-        console.log(`insert error`, e)
+        retry--
+        console.log(`insert error and retry`, retry, e)
+        await sleep(0.1)
+        return insert({ index, vectors, namespace, retry })
     }
 
     return false

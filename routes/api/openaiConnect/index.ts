@@ -11,8 +11,9 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration)
 
 export const getEmbeddings = async ({ textList, retry }: { textList: string[]; retry?: number }) => {
-    retry = isNaN(retry) ? 3 : retry;
+    retry = isNaN(retry) ? 3 : retry
     if (!(retry > 0)) {
+        console.log(`getEmbeddings failed, retry:`, retry)
         return []
     }
     try {

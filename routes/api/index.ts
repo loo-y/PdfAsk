@@ -4,6 +4,7 @@ import { getEmbeddings, chatAskQuestion } from './openaiConnect'
 import { getIndex, createIndex, insert, findSimilar, deleteAllVectors } from './pineconeConnect/direct'
 import { splitTextInDoc } from './contexts'
 import { sha256_16bit, executeInOrder } from './util'
+import { sleep } from '../util'
 
 const router = Router()
 export default function (app) {
@@ -34,10 +35,12 @@ router.post('/sendpdf', async (req, res, next) => {
     await deleteAllVectors({ index: openaiPineconeIndex, namespace: sha256_namespace })
 
     const chunkDocsList = _.chunk(docs, 5)
-
-    await executeInOrder(
+    console.log(`🐹🐹🐹chunkDocs total: 🐹🐹🐹`, chunkDocsList.length)
+    let upsertedTotalCount = 0,
+        vectorsTotal = 0
+    await Promise.all(
         _.map(chunkDocsList, (chunkDocs, chunkIndex) => {
-            return async () => {
+            return (async () => {
                 const textList = _.map(chunkDocs, (doc: any) => {
                     const { pageContent, metadata } = doc || {}
                     return pageContent
@@ -45,6 +48,7 @@ router.post('/sendpdf', async (req, res, next) => {
                 const vectors = await getEmbeddings({
                     textList,
                 })
+                vectorsTotal += vectors?.length || 0
                 const completedVectors = _.map(vectors, (vector, index) => {
                     return {
                         id: `pdf-${chunkIndex}-${index}`,
@@ -53,16 +57,17 @@ router.post('/sendpdf', async (req, res, next) => {
                     }
                 })
                 console.log(`vertors from getEmbeddings completedVectors`, completedVectors)
-                await insert({
+                let upsertedCount = await insert({
                     index: openaiPineconeIndex,
                     vectors: completedVectors,
                     namespace: sha256_namespace,
                 })
-            }
+                upsertedTotalCount += upsertedCount || 0
+            })()
         })
     )
 
-    return res.status(200).json({ docs, namespace: sha256_namespace })
+    return res.status(200).json({ upsertedTotalCount, vectorsTotal, docs, namespace: sha256_namespace })
 })
 
 router.post('/getpdf', async (req, res, next) => {
@@ -108,5 +113,5 @@ router.post('/query', async (req, res, next) => {
         content: getAllContentOverSeven.join('\n'),
         question: text,
     })
-    return res.status(200).json({ result: answer })
+    return res.status(200).json(answer ? { result: answer } : { result: `网络错误请重试` })
 })
