@@ -1,10 +1,10 @@
 import React from 'react'
-import PdfReader from './PdfReader';
+import PdfReader from './PdfReader'
 import ChatTalk from './ChatTalk'
 
-const Body = ()=>{
+const Body = () => {
     return (
-        <div className='pdfask_body' id="pdfask_body">
+        <div className="pdfask_body" id="pdfask_body">
             <PdfReader />
             <ChatTalk />
         </div>

@@ -1,4 +1,3 @@
-
 import * as dotenv from 'dotenv'
 dotenv.config()
 export const defaultDocLength = 500
@@ -19,4 +18,4 @@ export const VectorBaseUrl = `https://{{index}}-${projectName}.svc.${env}.pineco
 export const VectorUpsertUrl = `${VectorBaseUrl}/vectors/upsert`
 export const VectorDeltUrl = `${VectorBaseUrl}/vectors/delete`
 export const VectorQueryUrl = `${VectorBaseUrl}/query`
-export const defaultDimension = 1536;
+export const defaultDimension = 1536

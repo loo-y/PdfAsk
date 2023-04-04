@@ -3,7 +3,7 @@ import { State } from './Model'
 import Ctrl from './Controller'
 import Body from './component/Body'
 export type ViewProps = {
-    state: State,
+    state: State
     ctrl: Ctrl
 }
 

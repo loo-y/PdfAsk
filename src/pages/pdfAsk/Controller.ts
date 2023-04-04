@@ -37,7 +37,6 @@ export default class PdfAskController extends Controller<Model.State, Action> {
 
     async componentDidFirstMount() {
         console.log(`componentDidFirstMount`)
-
     }
 
     async componentDidMount() {
@@ -46,18 +45,18 @@ export default class PdfAskController extends Controller<Model.State, Action> {
 
     /************************* fetch **************************/
 
-    fetchQuery = async (text)=>{
+    fetchQuery = async text => {
         const url = `/api/query`
         const { namespace } = this.store.getState()
-        try{
+        try {
             const params = {
                 text,
                 namespace,
             }
             const resp = await this.post(url, params)
-            console.log(`相关回答: \n`,resp?.result?.content || resp?.error)
-            return resp;
-        }catch(e){
+            console.log(`相关回答: \n`, resp?.result?.content || resp?.error)
+            return resp
+        } catch (e) {
             return null
         }
     }
@@ -65,53 +64,52 @@ export default class PdfAskController extends Controller<Model.State, Action> {
 
     /************************* handler **************************/
 
-    handleSetPageContentList = (pagesContentList)=>{
+    handleSetPageContentList = pagesContentList => {
         const { UPDATE_STATE } = this.store.actions || {}
         UPDATE_STATE({
-            pagesContentList
+            pagesContentList,
         })
     }
-    handleUPloadPdf = async(filename)=>{
+    handleUPloadPdf = async filename => {
         const { UPDATE_STATE } = this.store.actions || {}
-        UPDATE_STATE({uploadStatus: PDF_UPLOAD_STATUS.LOADING })
+        UPDATE_STATE({ uploadStatus: PDF_UPLOAD_STATUS.LOADING })
         const { pagesContentList } = this.store.getState() || {}
-        let longContextList: Array<LONG_CONTEXT_TYPE> = [];
-        _.map(pagesContentList, pageContentList=>{
-            const {
+        let longContextList: Array<LONG_CONTEXT_TYPE> = []
+        _.map(pagesContentList, pageContentList => {
+            const { page, contentList } = pageContentList || {}
+            let longContext: LONG_CONTEXT_TYPE = {
                 page,
-                contentList
-            } = pageContentList || {}
-            let longContext: LONG_CONTEXT_TYPE  = {
-                page,
-                textlines: []
+                textlines: [],
             }
-            let thisLine = '', lastTransformString = '';
-            _.map(contentList, (content, contentIndex: number)=>{
-                const {
-                    transform, str
-                } = content || {}
-                const sameLineTrans = (transform.slice(0, 4).concat([transform[transform.length-1]])).join(',')
-                if(!lastTransformString || (sameLineTrans == lastTransformString)){
-                    thisLine += str;
-                    if(contentIndex == contentList.length - 1){
+            let thisLine = '',
+                lastTransformString = ''
+            _.map(contentList, (content, contentIndex: number) => {
+                const { transform, str } = content || {}
+                const sameLineTrans = transform
+                    .slice(0, 4)
+                    .concat([transform[transform.length - 1]])
+                    .join(',')
+                if (!lastTransformString || sameLineTrans == lastTransformString) {
+                    thisLine += str
+                    if (contentIndex == contentList.length - 1) {
                         longContext.textlines.push(thisLine)
                     }
                 } else {
                     longContext.textlines.push(thisLine)
-                    thisLine = str;
+                    thisLine = str
                 }
                 lastTransformString = sameLineTrans
             })
 
             longContextList.push({
-                ...longContext
+                ...longContext,
             })
         })
 
         console.log(longContextList)
 
         const url = `/api/sendpdf`
-        try{
+        try {
             const params = {
                 longContextList,
                 pdfName: filename,
@@ -123,24 +121,24 @@ export default class PdfAskController extends Controller<Model.State, Action> {
                 namespace,
                 uploadStatus: PDF_UPLOAD_STATUS.SUCCESS,
             })
-            return true;
-        }catch(e){
-           console.log(`handleUploadPdf error`, e) 
+            return true
+        } catch (e) {
+            console.log(`handleUploadPdf error`, e)
         }
-        UPDATE_STATE({uploadStatus: PDF_UPLOAD_STATUS.FAILED})
-        return false;
+        UPDATE_STATE({ uploadStatus: PDF_UPLOAD_STATUS.FAILED })
+        return false
     }
 
-    handleGetAnswer = async (text)=>{
+    handleGetAnswer = async text => {
         const trimText = _.trim(text)
-        if(!(trimText.length > 0)) return false;
+        if (!(trimText.length > 0)) return false
         const now = new Date()
         const { ADD_QUERY_ASK, ADD_QUERY_ANSWER } = this.store.actions || {}
         ADD_QUERY_ASK({
             askInfo: {
                 timestamp: now.getTime(),
                 question: trimText,
-            }
+            },
         })
         const resultQuery = await this.fetchQuery(trimText)
 
@@ -148,9 +146,9 @@ export default class PdfAskController extends Controller<Model.State, Action> {
             answerInfo: {
                 timestamp: now.getTime(),
                 answer: resultQuery?.result?.content || `没有找到相关的内容`,
-            }
+            },
         })
-        
-        return true;
+
+        return true
     }
 }
