@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { getEmbeddings, chatAskQuestion } from './openaiConnect'
 import { getIndex, createIndex, insert, findSimilar, deleteAllVectors} from './pineconeConnect/direct'
 import { splitTextInDoc, } from './contexts'
-import { sha256_16bit } from './util'
+import { sha256_16bit, executeInOrder } from './util'
 
 
 const router = Router()
@@ -35,10 +35,13 @@ router.post("/sendpdf",  async (req, res, next) => {
     }
     console.log(`sendpdf`, docs)
 
+    // 先删除
+    await deleteAllVectors({index: openaiPineconeIndex, namespace: sha256_namespace})
+
     const chunkDocsList = _.chunk(docs, 5)
 
-    await Promise.all(_.map(chunkDocsList, (chunkDocs, chunkIndex)=>{
-        return new Promise(async(resolve, reject)=>{
+    await executeInOrder(_.map(chunkDocsList, (chunkDocs, chunkIndex)=>{
+        return async ()=>{
             const textList = _.map(chunkDocs, (doc: any)=>{
                 const {
                     pageContent, metadata
@@ -61,8 +64,7 @@ router.post("/sendpdf",  async (req, res, next) => {
                 vectors: completedVectors,
                 namespace: sha256_namespace,
             })
-            resolve(true);
-        })
+        }
     }))
 
     return res.status(200).json({docs, namespace: sha256_namespace})

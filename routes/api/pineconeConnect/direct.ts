@@ -92,6 +92,7 @@ export const insert = async ({index, vectors, namespace}: {index?: string, vecto
         const result = await fetch(url, params)
         if(result.status == 200){
             const res = await result.json()
+            console.log(`insert succeess`)
             return res?.upsertedCount
         }
         const error = await result.json()

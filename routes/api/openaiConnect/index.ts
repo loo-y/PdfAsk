@@ -12,8 +12,12 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export const getEmbeddings = async ({
-    textList,
-}: {textList: string[]})=>{
+    textList, retry
+}: {textList: string[], retry?: number})=>{
+    retry = isNaN(retry) ? 3 : retry;
+    if(!(retry > 0)){
+        return []
+    }
     try{
         const response = await openai.createEmbedding({
             model: "text-embedding-ada-002",
@@ -26,7 +30,9 @@ export const getEmbeddings = async ({
     
         if(!_.isEmpty(data)) return data;
     }catch(e){
-        console.log(`getEmbeddingsFromOpenai`, e)
+        retry--;
+        console.log(`getEmbeddingsFromOpenai error, retry`, retry)
+        return getEmbeddings({textList, retry})
     }
 
     return []

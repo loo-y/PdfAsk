@@ -12,3 +12,9 @@ export const sha256_16bit = (data?: string): string => {
     const hash = sha256(data)
     return hash.slice(0, 16);
 }
+
+export const executeInOrder = async(promises: Array<() => Promise<any>>) =>{
+    for (const promise of promises) {
+      await promise();
+    }
+}
