@@ -8,5 +8,5 @@ export interface DocumentParams {
 export declare class Document implements DocumentParams {
     pageContent: string
     metadata: Record<string, any>
-    constructor(fields?: Partial<DocumentParams>);
+    constructor(fields?: Partial<DocumentParams>)
 }
