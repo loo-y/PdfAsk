@@ -98,7 +98,7 @@ router.post('/query', async (req, res, next) => {
     const getAllContentOverSeven = _.compact(
         _.map(result, r => {
             const { metadata, score } = r || {}
-            if (score > 0.7 && metadata?.pageContent) {
+            if (score > 0.1 && metadata?.pageContent) {
                 return metadata.pageContent
             } else {
                 return null
