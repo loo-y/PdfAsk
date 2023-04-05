@@ -8,12 +8,14 @@ type InitialState = {
     pagesContentList: AnyObj[]
     rollAskAnswerInfo: AskAnswerInfo[]
     uploadStatus: PDF_UPLOAD_STATUS
+    namespace: string
 }
 
 export type State = BaseState & InitialState
 
 export const initialState = {
     uploadStatus: PDF_UPLOAD_STATUS.UNLOAD,
+    namespace: '',
 }
 
 export const ADD_QUERY_ASK: Action<State, { askInfo: AskAnswerInfo }> = (state, { askInfo }) => {

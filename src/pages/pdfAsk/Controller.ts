@@ -5,7 +5,7 @@ import * as Model from './Model'
 import Controller from 'react-imvc/controller'
 import { Location, Context, SSR } from 'react-imvc'
 import { LONG_CONTEXT_TYPE, PDF_UPLOAD_STATUS } from './types'
-import { sleep } from '../../shared/util'
+import { sleep, getLowercaseQuery } from '../../shared/util'
 
 export type Action = Omit<typeof Model, 'initialState'>
 export default class PdfAskController extends Controller<Model.State, Action> {
@@ -21,8 +21,13 @@ export default class PdfAskController extends Controller<Model.State, Action> {
 
     getInitialState(initialState) {
         let state = super.getInitialState(initialState)
+        let query = getLowercaseQuery(this.location?.query)
+        const { namespace } = query || {}
+
         return {
             ...state,
+            query,
+            namespace,
         }
     }
 

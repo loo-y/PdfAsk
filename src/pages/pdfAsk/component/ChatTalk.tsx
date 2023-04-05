@@ -11,7 +11,7 @@ import { PDF_UPLOAD_STATUS } from '../types'
 
 const ChatTalk = () => {
     const state: AnyObj = useModelState<State>() || {}
-    const { uploadStatus } = state || {}
+    const { uploadStatus, namespace } = state || {}
 
     const stickyProps = {
         top: 20,
@@ -19,7 +19,7 @@ const ChatTalk = () => {
         className: `sticky_chat_talk`,
     }
 
-    if (uploadStatus !== PDF_UPLOAD_STATUS.SUCCESS) {
+    if (!namespace && uploadStatus !== PDF_UPLOAD_STATUS.SUCCESS) {
         return <div id="chat_talk"></div>
     }
     return (
