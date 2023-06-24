@@ -29,4 +29,4 @@ PINECONE_PRJ_NAME = "*******"
 ##
 
 ### AI菜鸡互助小组
-<img src="/assets/images/IMG_5531.jpg" alt="wechat group" width="200px" height="200px">
+<img src="/assets/images/wechat_group.jpg" alt="wechat group" width="200px" height="200px">
